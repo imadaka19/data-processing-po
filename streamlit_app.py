@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import io
 
+st.set_option('server.maxUploadSize', 1024)
+
 st.title("PO Data Processing")
 
 # Sidebar for additional information or options
