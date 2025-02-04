@@ -1,0 +1,2 @@
+[server]
+maxUploadSize = 1024  # Satuan MB, ubah sesuai kebutuhan (1024MB = 1GB)
