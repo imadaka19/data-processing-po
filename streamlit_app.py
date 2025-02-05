@@ -28,20 +28,23 @@ def reset_session():
 if st.button("🔄 Reset"):
     reset_session()
 
-file_shipment = st.file_uploader("Upload Shipment File (Excel)", type=['xlsx'])
-file_batmis = st.file_uploader("Upload Batmis File (CSV)", type=['csv'])
-file_procurement = st.file_uploader("Upload Procurement File (Excel)", type=['xlsx'])
+fileShipment = st.file_uploader("Upload Shipment File (Excel)", type=['xlsx'])
+fileBatmis = st.file_uploader("Upload Batmis File (CSV)", type=['csv'])
+fileProcurement = st.file_uploader("Upload Procurement File (Excel)", type=['xlsx'])
 
-if file_shipment and file_batmis and file_procurement:
+if fileShipment and fileBatmis and fileProcurement:
     if st.button("Submit & Process Merge Data"):
         try:
-            dataMerge = fungsi.process_merge_data(file_shipment, file_batmis, file_procurement)
+            dataMerge, oldestDate, newestDate= fungsi.process_merge_data(fileShipment, fileBatmis, fileProcurement)
+            # oldestDate = dataMerge['CREATED DATE_x'].min()
+            # newestDate = dataMerge['CREATED DATE_x'].max()
 
             output = io.BytesIO()
             with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
                 dataMerge.to_excel(writer, index=False, sheet_name='Processed Data')
             output.seek(0)
-
+            st.session_state['oldestDate'] = oldestDate
+            st.session_state['newestDate'] = newestDate
             st.session_state['processed_file'] = output
             st.session_state['dataMerge'] = dataMerge
 
@@ -51,21 +54,27 @@ if file_shipment and file_batmis and file_procurement:
 
     if 'processed_file' in st.session_state:
         st.download_button(
+            
             label="Download Hasil Merge",
             data=st.session_state['processed_file'],
-            file_name="dataMerge.xlsx",
+            file_name='PROCESSED DATA_%s_%s.xlsx' %(st.session_state['oldestDate'], st.session_state['newestDate']),
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
     if 'dataMerge' in st.session_state and st.button("Process Pivot Data"):
         try:
-            quartile_counts = fungsi.process_pivot_data(st.session_state['dataMerge'])
+            pivotCreated_RRP, pivotCreated_Shipment, pivotCreated_ShipmentQ, oldestDate2, newestDate2 = fungsi.process_pivot_data(st.session_state['dataMerge'])
 
             output_pivot = io.BytesIO()
+            
             with pd.ExcelWriter(output_pivot, engine='xlsxwriter') as writer:
-                quartile_counts.to_excel(writer, sheet_name='Pivot Data')
-            output_pivot.seek(0)
+                pivotCreated_RRP.to_excel(writer, sheet_name='Timeline RRP Table', index=True)
+                pivotCreated_Shipment.to_excel(writer, sheet_name='Shipment Movement (Per Date)', index=True)
+                pivotCreated_ShipmentQ.to_excel(writer, sheet_name='Shipment Movement (Per Q)', index=True)
 
+            output_pivot.seek(0)
+            st.session_state['oldestDate2'] = oldestDate2
+            st.session_state['newestDate2'] = newestDate2
             st.session_state['pivot_file'] = output_pivot
 
             st.success("Pivot Data berhasil dibuat! Silakan unduh hasilnya di bawah.")
@@ -76,6 +85,6 @@ if file_shipment and file_batmis and file_procurement:
         st.download_button(
             label="Download Pivot Data",
             data=st.session_state['pivot_file'],
-            file_name="quartile_counts_pivot.xlsx",
+            file_name='TIMETABLE ORDER_%s_%s.xlsx' %(st.session_state['oldestDate2'], st.session_state['newestDate2']),
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
