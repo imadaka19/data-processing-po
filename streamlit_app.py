@@ -27,7 +27,7 @@ file_procurement = st.file_uploader("Upload Procurement File (Excel)", type=['xl
 if st.button("Reset"):
     st.session_state.clear()
     st.experimental_rerun()
-    
+
 if file_shipment and file_batmis and file_procurement:
     if st.button("Submit & Process Merge Data"):
         try:
