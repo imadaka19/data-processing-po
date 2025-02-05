@@ -23,6 +23,11 @@ file_shipment = st.file_uploader("Upload Shipment File (Excel)", type=['xlsx'])
 file_batmis = st.file_uploader("Upload Batmis File (CSV)", type=['csv'])
 file_procurement = st.file_uploader("Upload Procurement File (Excel)", type=['xlsx'])
 
+# Tombol Reset untuk menghapus data yang telah diunggah dan diproses
+if st.button("Reset"):
+    st.session_state.clear()
+    st.experimental_rerun()
+    
 if file_shipment and file_batmis and file_procurement:
     if st.button("Submit & Process Merge Data"):
         try:
