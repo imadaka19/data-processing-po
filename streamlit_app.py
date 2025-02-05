@@ -10,23 +10,27 @@ st.sidebar.text("""
     Langkah-langkah:\n
         1. Upload File Shipment, BATMIS, dan Procurement di tempat yang sudah disediakan.\n
         2. Klik tombol "Submit & Process Merge Data" untuk melakukan proses penggabungan data.\n
-        3. Tunggu hingga prosess selesai dilakukan hingga muncul tombol "Download Hasil Merge".\n
+        3. Tunggu hingga proses selesai dilakukan hingga muncul tombol "Download Hasil Merge".\n
         4. Klik tombol "Download Hasil Merge" untuk mendownload hasil penggabungan data.\n
-        5. Jika ingin lanjut untuk process pivoting data maka silahkan klik tombol "Process Pivot Data".\n
-        6. Tunggu hingga process pivot selesai dan akan muncul tombol "Download Pivot Data".
+        5. Jika ingin lanjut untuk proses pivoting data maka silakan klik tombol "Process Pivot Data".\n
+        6. Tunggu hingga proses pivot selesai dan akan muncul tombol "Download Pivot Data".
 """)
 
 # Streamlit App
 st.title("PO Data Processing")
 
+# Tombol Refresh untuk menghapus session state
+def reset_session():
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    st.rerun()  # Menggunakan st.rerun() untuk refresh aplikasi
+
+if st.button("🔄 Reset"):
+    reset_session()
+
 file_shipment = st.file_uploader("Upload Shipment File (Excel)", type=['xlsx'])
 file_batmis = st.file_uploader("Upload Batmis File (CSV)", type=['csv'])
 file_procurement = st.file_uploader("Upload Procurement File (Excel)", type=['xlsx'])
-
-# Tombol Reset untuk menghapus data yang telah diunggah dan diproses
-if st.button("Reset"):
-    st.session_state.clear()
-    st.rerun()
 
 if file_shipment and file_batmis and file_procurement:
     if st.button("Submit & Process Merge Data"):
