@@ -26,7 +26,7 @@ file_procurement = st.file_uploader("Upload Procurement File (Excel)", type=['xl
 # Tombol Reset untuk menghapus data yang telah diunggah dan diproses
 if st.button("Reset"):
     st.session_state.clear()
-    st.experimental_rerun()
+    st.rerun()
 
 if file_shipment and file_batmis and file_procurement:
     if st.button("Submit & Process Merge Data"):
