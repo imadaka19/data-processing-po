@@ -170,7 +170,8 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataMergeAllFiltered['Quartile_RRP'] = dataMergeAllFiltered['RRP_DATE'].apply(assign_quartile_rrp)
         dataMergeAllFiltered['Quartile_Shipped'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(assign_quartile_rrp)
         dataMergeAllFiltered['Quartile_Created'] = dataMergeAllFiltered['CREATED DATE_x'].apply(assign_quartile_created)
-        
+        dataMergeAllFiltered['Date_Shipped'] = dataMergeAllFiltered['DATE AWB OUT_x'].fillna('Invalid Date')
+
         dataMergeAllFiltered.drop_duplicates(subset=['ORDER_TYPE-NUMBER-LINE'], inplace=True, keep='last')
 
         oldestDate = dataMergeAllFiltered['CREATED DATE_x'].min()
@@ -184,6 +185,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 # Fungsi untuk pivot data
 def process_pivot_data(dataMergeAllFiltered):
     try:
+        ## --- Beginning of pivotCreated_RRP --- 
         pivotCreated_RRP = dataMergeAllFiltered.pivot_table(index='Quartile_Created', columns='Quartile_RRP', values='ORDER_TYPE-NUMBER-LINE', aggfunc='count')
 
         cancelCountCreated_RRP = dataMergeAllFiltered[
@@ -219,25 +221,28 @@ def process_pivot_data(dataMergeAllFiltered):
               new_columns.append(('Status', col))
 
         pivotCreated_RRP.columns = pd.MultiIndex.from_tuples(new_columns)
+        ## --- End of pivotCreated_RRP --- 
 
-        pivotCreated_Shipment = dataMergeAllFiltered.pivot_table(index='Quartile_Created', columns='Quartile_Shipped', values='ORDER_TYPE-NUMBER-LINE', aggfunc='count')
+        ## --- Beginning of pivotCreated_Shipment --- 
+
+        pivotCreated_Shipment = dataMergeAllFiltered.pivot_table(index='Quartile_Created', columns='Date_Shipped', values='ORDER_TYPE-NUMBER-LINE', aggfunc='count')
 
         cancelCountCreated_Shipment = dataMergeAllFiltered[
-            (dataMergeAllFiltered['Quartile_Shipped'].notna()) &
-            (dataMergeAllFiltered['Quartile_Shipped'] != '') &
+            (dataMergeAllFiltered['Date_Shipped'].notna()) &
+            (dataMergeAllFiltered['Date_Shipped'] != '') &
             (dataMergeAllFiltered['STATUS_x'] == 'CANCEL')
         ].groupby('Quartile_Created')['ORDER_TYPE-NUMBER-LINE'].count()
         pivotCreated_Shipment.insert(0, 'Cancelled', value = cancelCountCreated_Shipment)
 
         totalCountCreated_Shipment = dataMergeAllFiltered[
-            (dataMergeAllFiltered['Quartile_Shipped'].notna()) &
-            (dataMergeAllFiltered['Quartile_Shipped'] != '') &
+            (dataMergeAllFiltered['Date_Shipped'].notna()) &
+            (dataMergeAllFiltered['Date_Shipped'] != '') &
             (dataMergeAllFiltered['STATUS_x'] != 'CANCEL')
         ].groupby('Quartile_Created')['ORDER_TYPE-NUMBER-LINE'].count()
         pivotCreated_Shipment.insert(0, 'Beginning Balance', value = totalCountCreated_Shipment)
 
         nfDateCreated_Shipment = dataMergeAllFiltered[
-            (dataMergeAllFiltered['Quartile_Shipped'].isna() | (dataMergeAllFiltered['Quartile_Shipped'] == 'Invalid Date')) &
+            (dataMergeAllFiltered['Date_Shipped'].isna() | (dataMergeAllFiltered['Date_Shipped'] == 'Invalid Date')) &
             (dataMergeAllFiltered['STATUS_x'] != 'CANCEL')
         ].groupby('Quartile_Created')['ORDER_TYPE-NUMBER-LINE'].count()
         pivotCreated_Shipment.insert(2, 'Part Not Yet Received', value = nfDateCreated_Shipment)
@@ -254,7 +259,12 @@ def process_pivot_data(dataMergeAllFiltered):
             else:
               new_columns.append(('Status', col))
 
+        pivotCreated_Shipment = pivotCreated_Shipment.sort_index(axis=1)
         pivotCreated_Shipment.columns = pd.MultiIndex.from_tuples(new_columns)
+
+        ## --- End of  pivotCreated_Shipment --- 
+
+        ## --- Beginning of  pivotCreated_ShipmentQ --- 
 
         pivotCreated_ShipmentQ = dataMergeAllFiltered.pivot_table(index='Quartile_Created', columns='Quartile_Shipped', values='ORDER_TYPE-NUMBER-LINE', aggfunc='count')
 
@@ -291,6 +301,8 @@ def process_pivot_data(dataMergeAllFiltered):
               new_columns.append(('Status', col))
 
         pivotCreated_ShipmentQ.columns = pd.MultiIndex.from_tuples(new_columns)
+
+        ## --- End of  pivotCreated_ShipmentQ --- 
 
         oldestDate = dataMergeAllFiltered['CREATED DATE_x'].min()
         newestDate = dataMergeAllFiltered['CREATED DATE_x'].max()
