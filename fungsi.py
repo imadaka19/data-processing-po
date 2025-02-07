@@ -29,7 +29,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataShipmentRaw = pd.concat([dataShipmentRaw_1, dataShipmentRaw_2])
 
-        dataBatmisRaw = pd.read_csv("file.csv", delimiter=delimiter, dtype=str, on_bad_lines="skip")
+        dataBatmisRaw = pd.read_csv(fileBatmis, delimiter=delimiter, dtype=str, on_bad_lines="skip")
         # Preparasi Data Procurement
         dataProcurementRaw_1 = pd.read_excel(fileProcurement, sheet_name='AFM')
         dataProcurementRaw_2 = pd.read_excel(fileProcurement, sheet_name='CMA')
@@ -48,9 +48,9 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataProcurementRaw['LINE'] = pd.to_numeric(dataProcurementRaw['LINE'], errors='coerce').astype('Int64')
 
         # Pengolahan data BATMIS
-        dataBatmisProcessed = dataBatmisRaw[['REQUISITION', 'ORDER TYPE', 'ORDER NUMBER', 'ORDER LINE', 'STATUS', 'CREATED DATE', 'DATE AWB OUT', 'AUTHORIZATION_DATE', 'AUTHRQ_DATE', 'AUTHRQ_ID', 'AUTHRQ_BY', 'ORDER PN ', 'PN DESCRIPTION', 'GRB_HISTORY', 'QTY', 'QTY_RCVD', 'UOM', 'AWB IN NUMBER', 'RRP_DATE', 'RRP_BY', 'NAME_RRPBY']]
+        dataBatmisProcessed = dataBatmisRaw[['REQUISITION', 'ORDER TYPE', 'ORDER NUMBER', 'ORDER LINE', 'STATUS', 'CREATED DATE', 'DATE AWB OUT', 'AUTHORIZATION_DATE', 'AUTHRQ_DATE', 'AUTHRQ_ID', 'AUTHRQ_BY', 'ORDER PN', 'PN DESCRIPTION', 'GRB_HISTORY', 'QTY', 'QTY_RCVD', 'UOM', 'AWB IN NUMBER', 'RRP_DATE', 'RRP_BY', 'NAME_RRPBY']]
         dataBatmisProcessed['ORDER_TYPE-NUMBER-LINE'] = dataBatmisProcessed['ORDER TYPE'] + '-' + dataBatmisProcessed['ORDER NUMBER'].astype(str) + '-' + dataBatmisProcessed['ORDER LINE'].astype(str)
-        dataBatmisProcessed['ORDER_TYPE-NUMBER-PN'] = dataBatmisProcessed['ORDER TYPE'] + '-' + dataBatmisProcessed['ORDER NUMBER'].astype(str)+ '-' + dataBatmisProcessed['ORDER PN '].astype(str)
+        dataBatmisProcessed['ORDER_TYPE-NUMBER-PN'] = dataBatmisProcessed['ORDER TYPE'] + '-' + dataBatmisProcessed['ORDER NUMBER'].astype(str)+ '-' + dataBatmisProcessed['ORDER PN'].astype(str)
 
         dataBatmisProcessed = dataBatmisProcessed.set_index('ORDER_TYPE-NUMBER-LINE')
         dataBatmisProcessed['ORDER_TYPE-NUMBER-LINE'] = dataBatmisProcessed['ORDER TYPE'] + '-' + dataBatmisProcessed['ORDER NUMBER'].astype(str) + '-' + dataBatmisProcessed['ORDER LINE'].astype(str)
@@ -103,7 +103,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataMerge = dataBatmisProcessed.merge(dataProcurement, how='left', left_index=True, right_index=True)
         dataMerge.reset_index(inplace=True)
         dataMerge.set_index('ORDER_TYPE-NUMBER-PN', inplace=True)
-        dataMerge['ORDER_TYPE-NUMBER-PN'] = dataMerge['ORDER TYPE_x'] + '-' + dataMerge['ORDER NUMBER_x'].astype(str)+ '-' + dataMerge['ORDER PN '].astype(str)
+        dataMerge['ORDER_TYPE-NUMBER-PN'] = dataMerge['ORDER TYPE_x'] + '-' + dataMerge['ORDER NUMBER_x'].astype(str)+ '-' + dataMerge['ORDER PN'].astype(str)
 
         # Merging DataMerge dengan data Shipment
         dataMergeAll = dataMerge.merge(dataShipment2, how='left', left_index=True, right_index=True)
@@ -115,7 +115,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataMergeAllFiltered = dataMergeAll[[
              'ORDER_TYPE-NUMBER-LINE', 'REQUISITION', 'ORDER TYPE_x', 'ORDER NUMBER_x', 'ORDER LINE_x', 'STATUS_x', 'CREATED DATE_x',
-             'DATE AWB OUT_x', 'AUTHORIZATION_DATE', 'AUTHRQ_DATE', 'AUTHRQ_BY', 'ORDER PN ', 'PN DESCRIPTION', 'GRB_HISTORY',
+             'DATE AWB OUT_x', 'AUTHORIZATION_DATE', 'AUTHRQ_DATE', 'AUTHRQ_BY', 'ORDER PN', 'PN DESCRIPTION', 'GRB_HISTORY',
              'QTY', 'QTY_RCVD', 'UOM', 'AWB IN NUMBER', 'AWB/BL NUMBER', 'RRP_DATE', 'RRP_BY', 'NAME_RRPBY', 'ETA', 'STANDARD STATUS', 'GENERAL STATUS', 'STATUS_y']]
 
         dataMergeAllFiltered.reset_index(drop=True,inplace=True)
