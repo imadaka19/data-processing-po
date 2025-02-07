@@ -1,28 +1,50 @@
 import pandas as pd
 
+def read_excel_safe(file, sheet_name, skiprows=None):
+    try:
+        return pd.read_excel(file, sheet_name=sheet_name, skiprows=skiprows, engine='openpyxl')
+    except FileNotFoundError:
+        print(f"Error: File {file} not found.")
+    except ValueError:
+        print(f"Error: Sheet '{sheet_name}' not found in {file}.")
+    except Exception as e:
+        print(f"Unexpected error while reading {file}, sheet '{sheet_name}': {e}")
+    return pd.DataFrame()
+
+def read_csv_safe(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
+    for enc in encodings:
+        try:
+            return pd.read_csv(file, encoding=enc, error_bad_lines=False, quoting=3)
+        except UnicodeDecodeError:
+            print(f"Error decoding CSV file with {enc} encoding, trying next encoding.")
+        except FileNotFoundError:
+            print(f"Error: File {file} not found.")
+            break
+        except Exception as e:
+            print(f"Unexpected error while reading {file}: {e}")
+            break
+    return pd.DataFrame()
+
 # Fungsi untuk merge data
 def process_merge_data(fileShipment, fileBatmis, fileProcurement):
     try:
         # Read Data Shipment & BATMIS
-        dataShipmentRaw_1 = pd.read_excel(fileShipment, sheet_name='KUL-VENDOR 2025', skiprows=2, engine='openpyxl')
-        dataShipmentRaw_2 = pd.read_excel(fileShipment, sheet_name='BTH-VENDOR', skiprows=2, engine='openpyxl')
-        dataShipmentRaw_3 = pd.read_excel(fileShipment, sheet_name='PLB MONITORING', engine='openpyxl')
+        dataShipmentRaw_1 = read_excel_safe(fileShipment, 'KUL-VENDOR 2025', skiprows=2)
+        dataShipmentRaw_2 = read_excel_safe(fileShipment, 'BTH-VENDOR', skiprows=2)
+        dataShipmentRaw_3 = read_excel_safe(fileShipment, 'PLB MONITORING')
 
-        dataShipmentRaw = pd.concat([dataShipmentRaw_1, dataShipmentRaw_2])
+        dataShipmentRaw = pd.concat([dataShipmentRaw_1, dataShipmentRaw_2], ignore_index=True) if not dataShipmentRaw_1.empty and not dataShipmentRaw_2.empty else pd.DataFrame()
 
-        try:
-            dataBatmisRaw = pd.read_csv(fileBatmis, encoding='utf-8',error_bad_lines=False, quoting=3 )  # Jika error, coba 'ISO-8859-1' atau 'latin1'
-        except UnicodeDecodeError:
-            print("Error decoding CSV file with UTF-8, trying ISO-8859-1 encoding.")
-            dataBatmisRaw = pd.read_csv(fileBatmis, encoding='ISO-8859-1',error_bad_lines=False, quoting=3 )
-        # Preparasi Data Procurement
-        dataProcurementRaw_1 = pd.read_excel(fileProcurement, sheet_name='AFM', engine='openpyxl')
-        dataProcurementRaw_2 = pd.read_excel(fileProcurement, sheet_name='CMA', engine='openpyxl')
-        dataProcurementRaw_3 = pd.read_excel(fileProcurement, sheet_name='PPM', engine='openpyxl')
-        dataProcurementRaw_4 = pd.read_excel(fileProcurement, sheet_name='PO', engine='openpyxl')
-        dataProcurementRaw_5 = pd.read_excel(fileProcurement, sheet_name='TOOLS', engine='openpyxl')
-        dataProcurementRaw_6 = pd.read_excel(fileProcurement, sheet_name='FAST MOVING', engine='openpyxl')
+        dataBatmisRaw = read_csv_safe(fileBatmis)
 
+        # Read Data Procurement
+        dataProcurementRaw_1 = read_excel_safe(fileProcurement, 'AFM')
+        dataProcurementRaw_2 = read_excel_safe(fileProcurement, 'CMA')
+        dataProcurementRaw_3 = read_excel_safe(fileProcurement, 'PPM')
+        dataProcurementRaw_4 = read_excel_safe(fileProcurement, 'PO')
+        dataProcurementRaw_5 = read_excel_safe(fileProcurement, 'TOOLS')
+        dataProcurementRaw_6 = read_excel_safe(fileProcurement, 'FAST MOVING')
+        
         dataProcurementRaw_4.rename({'ORDER NUMBER':'ORDER', 'PN DESCRIPTION':'DESCRIPTION', 'STANDARD STATUS ORDER':'STANDARD STATUS', 'CURRENCY':'CURR'}, axis=1, inplace=True)
         dataProcurementRaw_5.rename({'ORDER NUMBER':'ORDER', 'PN DESCRIPTION':'DESCRIPTION', 'STANDARD STATUS ORDER':'STANDARD STATUS', 'CURRENCY':'CURR'}, axis=1, inplace=True)
         dataProcurementRaw_6.rename({'ORDER NUMBER':'ORDER', 'PN DESCRIPTION':'DESCRIPTION', 'STANDARD STATUS ORDER':'STANDARD STATUS', 'CURRENCY':'CURR'}, axis=1, inplace=True)
