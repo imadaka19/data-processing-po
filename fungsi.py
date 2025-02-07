@@ -14,7 +14,7 @@ def read_excel_safe(file, sheet_name, skiprows=None):
 def read_csv_safe(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
     for enc in encodings:
         try:
-            return pd.read_csv(file, encoding=enc, error_bad_lines=False, quoting=3)
+            return pd.read_csv(file, encoding=enc, on_bad_lines="skip", quoting=3)
         except UnicodeDecodeError:
             print(f"Error decoding CSV file with {enc} encoding, trying next encoding.")
         except FileNotFoundError:
@@ -44,7 +44,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataProcurementRaw_4 = read_excel_safe(fileProcurement, 'PO')
         dataProcurementRaw_5 = read_excel_safe(fileProcurement, 'TOOLS')
         dataProcurementRaw_6 = read_excel_safe(fileProcurement, 'FAST MOVING')
-        
+
         dataProcurementRaw_4.rename({'ORDER NUMBER':'ORDER', 'PN DESCRIPTION':'DESCRIPTION', 'STANDARD STATUS ORDER':'STANDARD STATUS', 'CURRENCY':'CURR'}, axis=1, inplace=True)
         dataProcurementRaw_5.rename({'ORDER NUMBER':'ORDER', 'PN DESCRIPTION':'DESCRIPTION', 'STANDARD STATUS ORDER':'STANDARD STATUS', 'CURRENCY':'CURR'}, axis=1, inplace=True)
         dataProcurementRaw_6.rename({'ORDER NUMBER':'ORDER', 'PN DESCRIPTION':'DESCRIPTION', 'STANDARD STATUS ORDER':'STANDARD STATUS', 'CURRENCY':'CURR'}, axis=1, inplace=True)
