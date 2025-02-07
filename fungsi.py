@@ -1,5 +1,24 @@
 import pandas as pd
 
+def detect_delimiter(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
+    """Deteksi delimiter dengan membaca beberapa baris pertama dari file CSV."""
+    for enc in encodings:
+        try:
+            with open(file, 'r', encoding=enc) as f:
+                first_line = f.readline()
+                if ';' in first_line and ',' in first_line:
+                    return ';'  # Default ke ";" jika keduanya ada
+                elif ';' in first_line:
+                    return ';'
+                else:
+                    return ','
+        except UnicodeDecodeError:
+            print(f"Error decoding CSV file with {enc} encoding, trying next encoding.")
+        except FileNotFoundError:
+            print(f"Error: File {file} not found.")
+            break
+    return ','
+
 def read_excel_safe(file, sheet_name, skiprows=None):
     try:
         return pd.read_excel(file, sheet_name=sheet_name, skiprows=skiprows, engine='openpyxl')
@@ -12,9 +31,11 @@ def read_excel_safe(file, sheet_name, skiprows=None):
     return pd.DataFrame()
 
 def read_csv_safe(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
+    delimiter = detect_delimiter(file, encodings)
+
     for enc in encodings:
         try:
-            return pd.read_csv(file, encoding=enc, on_bad_lines="skip", quoting=3)
+            return pd.read_csv(file, encoding=enc, on_bad_lines="skip", delimiter=delimiter, quoting=3)
         except UnicodeDecodeError:
             print(f"Error decoding CSV file with {enc} encoding, trying next encoding.")
         except FileNotFoundError:
