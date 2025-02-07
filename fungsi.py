@@ -151,6 +151,9 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(convert_date_format)
         dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(convert_date_format2)
 
+        dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce', format='%d/%m/%Y')
+        dataMergeAllFiltered['CREATED DATE_x'] = dataMergeAllFiltered['CREATED DATE_x'].apply(convert_date_format2)
+
         
         # Assigning quartile to created Date
         def assign_quartile_created(date_str):
@@ -192,6 +195,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataMergeAllFiltered['Date_Shipped'] = dataMergeAllFiltered['DATE AWB OUT_x'].fillna('Invalid Date')
 
         dataMergeAllFiltered.drop_duplicates(subset=['ORDER_TYPE-NUMBER-LINE'], inplace=True, keep='last')
+        dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce')
 
         oldestDate = dataMergeAllFiltered['CREATED DATE_x'].min()
         newestDate = dataMergeAllFiltered['CREATED DATE_x'].max()
