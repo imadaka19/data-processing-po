@@ -1,5 +1,4 @@
 import pandas as pd
-
 def detect_delimiter(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
     """Deteksi delimiter dengan membaca beberapa baris pertama dari file CSV."""
     for enc in encodings:
@@ -17,54 +16,27 @@ def detect_delimiter(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
         except FileNotFoundError:
             print(f"Error: File {file} not found.")
             break
-    return ','
-
-def read_excel_safe(file, sheet_name, skiprows=None):
-    try:
-        return pd.read_excel(file, sheet_name=sheet_name, skiprows=skiprows, engine='openpyxl')
-    except FileNotFoundError:
-        print(f"Error: File {file} not found.")
-    except ValueError:
-        print(f"Error: Sheet '{sheet_name}' not found in {file}.")
-    except Exception as e:
-        print(f"Unexpected error while reading {file}, sheet '{sheet_name}': {e}")
-    return pd.DataFrame()
-
-def read_csv_safe(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
-    delimiter = detect_delimiter(file, encodings)
-
-    for enc in encodings:
-        try:
-            return pd.read_csv(file, encoding=enc, on_bad_lines="skip", delimiter=delimiter, quoting=3)
-        except UnicodeDecodeError:
-            print(f"Error decoding CSV file with {enc} encoding, trying next encoding.")
-        except FileNotFoundError:
-            print(f"Error: File {file} not found.")
-            break
-        except Exception as e:
-            print(f"Unexpected error while reading {file}: {e}")
-            break
-    return pd.DataFrame()
+    return ','  # Default delimiter
 
 # Fungsi untuk merge data
 def process_merge_data(fileShipment, fileBatmis, fileProcurement):
+    delimiter = detect_delimiter(fileBatmis, encodings=['utf-8', 'ISO-8859-1', 'latin1'])
     try:
         # Read Data Shipment & BATMIS
-        dataShipmentRaw_1 = read_excel_safe(fileShipment, 'KUL-VENDOR 2025', skiprows=2)
-        dataShipmentRaw_2 = read_excel_safe(fileShipment, 'BTH-VENDOR', skiprows=2)
-        dataShipmentRaw_3 = read_excel_safe(fileShipment, 'PLB MONITORING')
+        dataShipmentRaw_1 = pd.read_excel(fileShipment, sheet_name='KUL-VENDOR 2025', skiprows=2)
+        dataShipmentRaw_2 = pd.read_excel(fileShipment, sheet_name='BTH-VENDOR', skiprows=2)
+        dataShipmentRaw_3 = pd.read_excel(fileShipment, sheet_name='PLB MONITORING')
 
-        dataShipmentRaw = pd.concat([dataShipmentRaw_1, dataShipmentRaw_2], ignore_index=True) if not dataShipmentRaw_1.empty and not dataShipmentRaw_2.empty else pd.DataFrame()
+        dataShipmentRaw = pd.concat([dataShipmentRaw_1, dataShipmentRaw_2])
 
-        dataBatmisRaw = read_csv_safe(fileBatmis)
-
-        # Read Data Procurement
-        dataProcurementRaw_1 = read_excel_safe(fileProcurement, 'AFM')
-        dataProcurementRaw_2 = read_excel_safe(fileProcurement, 'CMA')
-        dataProcurementRaw_3 = read_excel_safe(fileProcurement, 'PPM')
-        dataProcurementRaw_4 = read_excel_safe(fileProcurement, 'PO')
-        dataProcurementRaw_5 = read_excel_safe(fileProcurement, 'TOOLS')
-        dataProcurementRaw_6 = read_excel_safe(fileProcurement, 'FAST MOVING')
+        dataBatmisRaw = pd.read_csv("file.csv", delimiter=delimiter, dtype=str, on_bad_lines="skip")
+        # Preparasi Data Procurement
+        dataProcurementRaw_1 = pd.read_excel(fileProcurement, sheet_name='AFM')
+        dataProcurementRaw_2 = pd.read_excel(fileProcurement, sheet_name='CMA')
+        dataProcurementRaw_3 = pd.read_excel(fileProcurement, sheet_name='PPM')
+        dataProcurementRaw_4 = pd.read_excel(fileProcurement, sheet_name='PO')
+        dataProcurementRaw_5 = pd.read_excel(fileProcurement, sheet_name='TOOLS')
+        dataProcurementRaw_6 = pd.read_excel(fileProcurement, sheet_name='FAST MOVING')
 
         dataProcurementRaw_4.rename({'ORDER NUMBER':'ORDER', 'PN DESCRIPTION':'DESCRIPTION', 'STANDARD STATUS ORDER':'STANDARD STATUS', 'CURRENCY':'CURR'}, axis=1, inplace=True)
         dataProcurementRaw_5.rename({'ORDER NUMBER':'ORDER', 'PN DESCRIPTION':'DESCRIPTION', 'STANDARD STATUS ORDER':'STANDARD STATUS', 'CURRENCY':'CURR'}, axis=1, inplace=True)
