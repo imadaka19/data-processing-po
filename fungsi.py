@@ -1,26 +1,26 @@
 import pandas as pd
-def detect_delimiter(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
-    """Deteksi delimiter dengan membaca beberapa baris pertama dari file CSV."""
-    for enc in encodings:
-        try:
-            with open(file, 'r', encoding=enc) as f:
-                first_line = f.readline()
-                if ';' in first_line and ',' in first_line:
-                    return ';'  # Default ke ";" jika keduanya ada
-                elif ';' in first_line:
-                    return ';'
-                else:
-                    return ','
-        except UnicodeDecodeError:
-            print(f"Error decoding CSV file with {enc} encoding, trying next encoding.")
-        except FileNotFoundError:
-            print(f"Error: File {file} not found.")
-            break
-    return ','  # Default delimiter
+# def detect_delimiter(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
+#     """Deteksi delimiter dengan membaca beberapa baris pertama dari file CSV."""
+#     for enc in encodings:
+#         try:
+#             with open(file, 'r', encoding=enc) as f:
+#                 first_line = f.readline()
+#                 if ';' in first_line and ',' in first_line:
+#                     return ';'  # Default ke ";" jika keduanya ada
+#                 elif ';' in first_line:
+#                     return ';'
+#                 else:
+#                     return ','
+#         except UnicodeDecodeError:
+#             print(f"Error decoding CSV file with {enc} encoding, trying next encoding.")
+#         except FileNotFoundError:
+#             print(f"Error: File {file} not found.")
+#             break
+#     return ','  # Default delimiter
 
 # Fungsi untuk merge data
 def process_merge_data(fileShipment, fileBatmis, fileProcurement):
-    delimiter = detect_delimiter(fileBatmis, encodings=['utf-8', 'ISO-8859-1', 'latin1'])
+    # delimiter = detect_delimiter(fileBatmis, encodings=['utf-8', 'ISO-8859-1', 'latin1'])
     try:
         # Read Data Shipment & BATMIS
         dataShipmentRaw_1 = pd.read_excel(fileShipment, sheet_name='KUL-VENDOR 2025', skiprows=2)
@@ -29,7 +29,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataShipmentRaw = pd.concat([dataShipmentRaw_1, dataShipmentRaw_2])
 
-        dataBatmisRaw = pd.read_csv(fileBatmis, delimiter=delimiter, dtype=str, on_bad_lines="skip")
+        dataBatmisRaw = pd.read_csv(fileBatmis, delimiter=';', dtype=str, on_bad_lines="skip")
         # Preparasi Data Procurement
         dataProcurementRaw_1 = pd.read_excel(fileProcurement, sheet_name='AFM')
         dataProcurementRaw_2 = pd.read_excel(fileProcurement, sheet_name='CMA')
