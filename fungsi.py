@@ -4,9 +4,9 @@ import pandas as pd
 def process_merge_data(fileShipment, fileBatmis, fileProcurement):
     try:
         # Read Data Shipment & BATMIS
-        dataShipmentRaw_1 = pd.read_excel(fileShipment, sheet_name='KUL-VENDOR 2025', skiprows=2, engine='openpyxl')
-        dataShipmentRaw_2 = pd.read_excel(fileShipment, sheet_name='BTH-VENDOR', skiprows=2, engine='openpyxl')
-        dataShipmentRaw_3 = pd.read_excel(fileShipment, sheet_name='PLB MONITORING', engine='openpyxl')
+        dataShipmentRaw_1 = pd.read_excel(fileShipment, sheet_name='KUL-VENDOR 2025', skiprows=2, engine='openpyxl',on_bad_lines='skip')
+        dataShipmentRaw_2 = pd.read_excel(fileShipment, sheet_name='BTH-VENDOR', skiprows=2, engine='openpyxl',on_bad_lines='skip')
+        dataShipmentRaw_3 = pd.read_excel(fileShipment, sheet_name='PLB MONITORING', engine='openpyxl',on_bad_lines='skip')
 
         dataShipmentRaw = pd.concat([dataShipmentRaw_1, dataShipmentRaw_2])
 
@@ -16,12 +16,12 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
             print("Error decoding CSV file with UTF-8, trying ISO-8859-1 encoding.")
             dataBatmisRaw = pd.read_csv(fileBatmis, encoding='ISO-8859-1',on_bad_lines='skip')
         # Preparasi Data Procurement
-        dataProcurementRaw_1 = pd.read_excel(fileProcurement, sheet_name='AFM', engine='openpyxl')
-        dataProcurementRaw_2 = pd.read_excel(fileProcurement, sheet_name='CMA', engine='openpyxl')
-        dataProcurementRaw_3 = pd.read_excel(fileProcurement, sheet_name='PPM', engine='openpyxl')
-        dataProcurementRaw_4 = pd.read_excel(fileProcurement, sheet_name='PO', engine='openpyxl')
-        dataProcurementRaw_5 = pd.read_excel(fileProcurement, sheet_name='TOOLS', engine='openpyxl')
-        dataProcurementRaw_6 = pd.read_excel(fileProcurement, sheet_name='FAST MOVING', engine='openpyxl')
+        dataProcurementRaw_1 = pd.read_excel(fileProcurement, sheet_name='AFM', engine='openpyxl',on_bad_lines='skip')
+        dataProcurementRaw_2 = pd.read_excel(fileProcurement, sheet_name='CMA', engine='openpyxl',on_bad_lines='skip')
+        dataProcurementRaw_3 = pd.read_excel(fileProcurement, sheet_name='PPM', engine='openpyxl',on_bad_lines='skip')
+        dataProcurementRaw_4 = pd.read_excel(fileProcurement, sheet_name='PO', engine='openpyxl',on_bad_lines='skip')
+        dataProcurementRaw_5 = pd.read_excel(fileProcurement, sheet_name='TOOLS', engine='openpyxl',on_bad_lines='skip')
+        dataProcurementRaw_6 = pd.read_excel(fileProcurement, sheet_name='FAST MOVING', engine='openpyxl',on_bad_lines='skip')
 
         dataProcurementRaw_4.rename({'ORDER NUMBER':'ORDER', 'PN DESCRIPTION':'DESCRIPTION', 'STANDARD STATUS ORDER':'STANDARD STATUS', 'CURRENCY':'CURR'}, axis=1, inplace=True)
         dataProcurementRaw_5.rename({'ORDER NUMBER':'ORDER', 'PN DESCRIPTION':'DESCRIPTION', 'STANDARD STATUS ORDER':'STANDARD STATUS', 'CURRENCY':'CURR'}, axis=1, inplace=True)
