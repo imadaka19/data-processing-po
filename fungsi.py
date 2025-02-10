@@ -182,7 +182,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         #     except ValueError:
         #         return date_str
         dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(
-            lambda x: pd.to_datetime(x, errors='coerce').date() if pd.notna(x) else ''
+            lambda x: pd.to_datetime(x, errors='coerce').date() if pd.notna(x) else np.nan
         )
         dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))        
         # dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))
