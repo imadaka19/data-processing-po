@@ -1,4 +1,6 @@
 import pandas as pd
+import datetime
+import re
 # def detect_delimiter(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
 #     """Deteksi delimiter dengan membaca beberapa baris pertama dari file CSV."""
 #     for enc in encodings:
@@ -27,7 +29,11 @@ date_formats = [
     "%d-%m-%y",
 ]
 
-def convert_date(date_string, formats, target_format="%Y-%m-%d"): 
+def hapus_kutip(text) :
+    result = re.sub(r'^"(.*)"$', r'\1', text)
+    return result
+
+def convert_date(date_string, formats = date_formats, target_format="%Y-%m-%d"): 
     for fmt in formats: 
         try: 
             # Try to parse the date string with the current format 
@@ -49,7 +55,9 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataShipmentRaw = pd.concat([dataShipmentRaw_1, dataShipmentRaw_2])
 
-        dataBatmisRaw = pd.read_csv(fileBatmis, dtype=str, on_bad_lines="skip", sep=None, engine='python')
+        dataBatmisRaw = pd.read_csv(fileBatmis, dtype=str, on_bad_lines="skip", sep="[;,]", engine='python')
+        dataBatmisRaw = dataBatmisRaw.apply(hapus_kutip)
+        
         # Preparasi Data Procurement
         dataProcurementRaw_1 = pd.read_excel(fileProcurement, sheet_name='AFM')
         dataProcurementRaw_2 = pd.read_excel(fileProcurement, sheet_name='CMA')
