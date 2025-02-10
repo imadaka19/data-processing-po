@@ -185,19 +185,19 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))        
         # dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))
 
-        dataMergeAllFiltered['AUTHORIZATION_DATE'] = pd.to_datetime(dataMergeAllFiltered['AUTHORIZATION_DATE'], errors='coerce').dt.date
+        # dataMergeAllFiltered['AUTHORIZATION_DATE'] = pd.to_datetime(dataMergeAllFiltered['AUTHORIZATION_DATE'], errors='coerce').dt.date
         dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(lambda x: convert_date(str(x)))
         # dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(lambda x: convert_date(str(x)))
 
-        dataMergeAllFiltered['AUTHRQ_DATE'] = pd.to_datetime(dataMergeAllFiltered['AUTHRQ_DATE'], errors='coerce').dt.date
+        # dataMergeAllFiltered['AUTHRQ_DATE'] = pd.to_datetime(dataMergeAllFiltered['AUTHRQ_DATE'], errors='coerce').dt.date
         dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(lambda x: convert_date(str(x)))
         # dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(lambda x: convert_date(str(x)))
 
-        dataMergeAllFiltered['RRP_DATE'] = pd.to_datetime(dataMergeAllFiltered['RRP_DATE'], errors='coerce').dt.date
+        # dataMergeAllFiltered['RRP_DATE'] = pd.to_datetime(dataMergeAllFiltered['RRP_DATE'], errors='coerce').dt.date
         dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(lambda x: convert_date(str(x)))
         # dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(lambda x: convert_date(str(x)))
 
-        dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce').dt.date
+        # dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce').dt.date
         # dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce', format='%d/%m/%Y')
         dataMergeAllFiltered['CREATED DATE_x'] = dataMergeAllFiltered['CREATED DATE_x'].apply(lambda x: convert_date(str(x)))
 
