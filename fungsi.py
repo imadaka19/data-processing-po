@@ -111,10 +111,9 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataProcurement = dataProcurement.rename({'TYPE':'ORDER TYPE', 'ORDER':'ORDER NUMBER', 'LINE':'ORDER LINE', 'ORDER CREATED DATE':'CREATED DATE'}, axis=1)
         dataProcurement.drop(columns=['PN'], inplace=True)
 
-        # dataProcurement['CREATED DATE'] = pd.to_datetime(dataProcurement['CREATED DATE'], errors='coerce', format='%Y-%m-%d')
-        dataProcurement['CREATED DATE'] = dataProcurement['CREATED DATE'].apply(lambda x: convert_date(str(x)))
-        dataProcurement['ETA'] = dataProcurement['ETA'].apply(lambda x: convert_date(str(x)))
-        # dataProcurement['ETA'] = pd.to_datetime(dataProcurement['ETA'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
+        dataProcurement['CREATED DATE'] = pd.to_datetime(dataProcurement['CREATED DATE'], errors='coerce', format='%Y-%m-%d')
+
+        dataProcurement['ETA'] = pd.to_datetime(dataProcurement['ETA'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
 
         dataProcurement.rename({'TYPE':'ORDER TYPE', 'ORDER':'ORDER NUMBER', 'LINE':'ORDER LINE', 'ORDER CREATED DATE':'CREATED DATE', 'PN':'ORDER PN'}, axis=1, inplace=True)
 
@@ -126,10 +125,20 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataShipmentRaw_4.set_index(['ORDER_TYPE-NUMBER-PN'], inplace=True)
         dataShipmentRaw_4['ORDER_TYPE-NUMBER-PN'] = dataShipmentRaw_4['ORDER TYPE'] + '-' + dataShipmentRaw_4['ORDER NUMBER'].astype(str)+ '-' + dataShipmentRaw_4['PN'].astype(str)
 
-        # dataShipmentRaw_4['DELIVERY DATE'] = pd.to_datetime(dataShipmentRaw_4['DELIVERY DATE'], errors='coerce') # Convert to datetime, handle errors
-        # dataShipmentRaw_4['DELIVERY DATE'] = dataShipmentRaw_4['DELIVERY DATE'].dt.strftime('%Y-%m-%d')
-        dataShipmentRaw_4['DELIVERY DATE'] = dataShipmentRaw_4['DELIVERY DATE'].apply(lambda x: convert_date(str(x)))
-        
+        def swap_day_month(date):
+            if isinstance(date, datetime):
+                # Swap day and month
+                return datetime(date.year, date.day, date.month, date.hour, date.minute, date.second)
+            return date  # Return the string unchanged
+
+        swapped_data = [swap_day_month(d) for d in dataShipmentRaw_4['DELIVERY DATE']]
+
+        dataShipmentRaw_4['DELIVERY DATE'] = swapped_data
+
+
+        dataShipmentRaw_4['DELIVERY DATE'] = pd.to_datetime(dataShipmentRaw_4['DELIVERY DATE'], errors="coerce", dayfirst=False)
+        dataShipmentRaw_4['DELIVERY DATE'] = dataShipmentRaw_4['DELIVERY DATE'].dt.strftime('%Y-%m-%d')
+        dataShipmentRaw_4['DELIVERY DATE']= pd.to_datetime(dataShipmentRaw_4['DELIVERY DATE'], errors='ignore')
 
         # Mengolah data ShipmentRaw
         dataShipmentRaw = dataShipmentRaw[['ORDER TYPE', 'ORDER NUMBER', 'PN', 'AWB/BL NUMBER', 'DELIVERY DATE', 'STATUS NEW']]
