@@ -36,12 +36,12 @@ def hapus_kutip(text) :
 def convert_date(date_string, formats = date_formats, target_format="%Y-%m-%d"): 
     for fmt in formats: 
         try: 
-            # Try to parse the date string with the current format 
+            # Coba parsing tanggal dengan format yang sekarang
             date_obj = datetime.strptime(date_string, fmt) 
-            # Return the date in the target format 
+            # Kembalikan tanggal dalam format target
             return date_obj.strftime(target_format) 
         except ValueError: 
-            continue  # If it fails, try the next format 
+            continue  # Jika gagal, coba format berikutnya 
     raise ValueError(f"Date format for '{date_string}' not recognized.") 
 
 # Fungsi untuk merge data
@@ -167,20 +167,20 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         #     except ValueError:
         #         return date_str
 
-        dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(convert_date)
-        dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(convert_date)
+        dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))
+        dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))
 
-        dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(convert_date)
-        dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(convert_date)
+        dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(lambda x: convert_date(str(x)))
+        dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(lambda x: convert_date(str(x)))
 
-        dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(convert_date)
-        dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(convert_date)
+        dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(lambda x: convert_date(str(x)))
+        dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(lambda x: convert_date(str(x)))
 
-        dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(convert_date)
-        dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(convert_date)
+        dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(lambda x: convert_date(str(x)))
+        dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(lambda x: convert_date(str(x)))
 
         dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce', format='%d/%m/%Y')
-        dataMergeAllFiltered['CREATED DATE_x'] = dataMergeAllFiltered['CREATED DATE_x'].apply(convert_date)
+        dataMergeAllFiltered['CREATED DATE_x'] = dataMergeAllFiltered['CREATED DATE_x'].apply(lambda x: convert_date(str(x)))
 
         
         # Assigning quartile to created Date
