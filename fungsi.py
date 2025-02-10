@@ -35,8 +35,8 @@ date_formats = [
 #     return result
 
 def convert_date(date_string, formats=date_formats, target_format="%Y-%m-%d"):
-    # Cek jika nilai NaN atau bukan string
-    if pd.isna(date_string) or not isinstance(date_string, str) or date_string.lower() == 'nan':
+    # Cek jika nilai None, NaN, atau bukan string
+    if date_string is None or pd.isna(date_string) or not isinstance(date_string, str) or date_string.lower() == 'nan':
         return np.nan  # Kembalikan NaN agar tetap konsisten dalam DataFrame
     
     for fmt in formats:
