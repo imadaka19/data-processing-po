@@ -44,7 +44,7 @@ def convert_date(date_string, formats=date_formats, target_format="%Y-%m-%d"):
             # Coba parsing tanggal dengan format yang tersedia
             date_obj = datetime.strptime(str(date_string), fmt)
             # Kembalikan tanggal dalam format target
-            return date_obj.strftime(target_format)
+            return date_obj.strftime(target_format).dt.date
         except ValueError:
             continue  # Jika gagal, coba format berikutnya
     
@@ -238,7 +238,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataMergeAllFiltered['Date_Shipped'] = dataMergeAllFiltered['DATE AWB OUT_x'].fillna('Invalid Date')
 
         dataMergeAllFiltered.drop_duplicates(subset=['ORDER_TYPE-NUMBER-LINE'], inplace=True, keep='last')
-        dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce').dt.date
+        # dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce').dt.date
         # dataMergeAllFiltered['CREATED DATE_x'] = dataMergeAllFiltered['CREATED DATE_x'].date()
         
         oldestDate = dataMergeAllFiltered['CREATED DATE_x'].min()
