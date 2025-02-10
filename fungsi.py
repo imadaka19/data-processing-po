@@ -49,7 +49,7 @@ def convert_date(date_string, formats=date_formats, target_format="%Y-%m-%d"):
             continue  # Jika gagal, coba format berikutnya
     
     # Jika bukan tanggal valid, ubah menjadi NaN
-    return np.nan  
+    return date_string
 
 # Fungsi untuk merge data
 def process_merge_data(fileShipment, fileBatmis, fileProcurement):
