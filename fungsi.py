@@ -44,7 +44,7 @@ def convert_date(date_string, formats=date_formats, target_format="%Y-%m-%d"):
             # Coba parsing tanggal dengan format yang tersedia
             date_obj = datetime.strptime(str(date_string), fmt)
             # Kembalikan tanggal dalam format target
-            return date_obj.strftime(target_format).dt.date
+            return date_obj.strftime(target_format)
         except ValueError:
             continue  # Jika gagal, coba format berikutnya
     
@@ -183,6 +183,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         #         return date_str
 
         dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))
+        dataMergeAllFiltered['DATE AWB OUT_x'] = pd.to_datetime(dataMergeAllFiltered['DATE AWB OUT_x'], errors='coerce').dt.date
         # dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))
 
         dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(lambda x: convert_date(str(x)))
