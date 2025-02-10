@@ -294,6 +294,8 @@ def process_pivot_data(dataMergeAllFiltered):
 
         pivotCreated_Shipment = dataMergeAllFiltered.pivot_table(index='Quartile_Created', columns='Date_Shipped', values='ORDER_TYPE-NUMBER-LINE', aggfunc='count')
 
+        pivotCreated_Shipment = pivotCreated_Shipment.sort_index(axis=1)
+        
         cancelCountCreated_Shipment = dataMergeAllFiltered[
             (dataMergeAllFiltered['Date_Shipped'].notna()) &
             (dataMergeAllFiltered['Date_Shipped'] != '') &
