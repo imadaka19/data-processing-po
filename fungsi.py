@@ -293,9 +293,8 @@ def process_pivot_data(dataMergeAllFiltered):
         ## --- Beginning of pivotCreated_Shipment --- 
 
         pivotCreated_Shipment = dataMergeAllFiltered.pivot_table(index='Quartile_Created', columns='Date_Shipped', values='ORDER_TYPE-NUMBER-LINE', aggfunc='count')
-
         pivotCreated_Shipment = pivotCreated_Shipment.sort_index(axis=1)
-        
+
         cancelCountCreated_Shipment = dataMergeAllFiltered[
             (dataMergeAllFiltered['Date_Shipped'].notna()) &
             (dataMergeAllFiltered['Date_Shipped'] != '') &
@@ -318,7 +317,7 @@ def process_pivot_data(dataMergeAllFiltered):
 
         pivotCreated_Shipment.drop(columns='Invalid Date', inplace=True)
 
-        # Add MultiIndex as Header of Header
+
         pivotCreated_Shipment = pivotCreated_Shipment.rename_axis(None, axis=1)
         new_columns = []
 
@@ -328,8 +327,9 @@ def process_pivot_data(dataMergeAllFiltered):
             else:
               new_columns.append(('Status', col))
 
-        pivotCreated_Shipment = pivotCreated_Shipment.sort_index(axis=1)
+        # pivotCreated_Shipment = pivotCreated_Shipment
         pivotCreated_Shipment.columns = pd.MultiIndex.from_tuples(new_columns)
+
 
         ## --- End of  pivotCreated_Shipment --- 
 
