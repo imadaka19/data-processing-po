@@ -62,7 +62,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataShipmentRaw = pd.concat([dataShipmentRaw_1, dataShipmentRaw_2])
 
-        dataBatmisRaw = pd.read_csv(fileBatmis, dtype=str, on_bad_lines="skip", sep="[;,]", engine='python')
+        dataBatmisRaw = pd.read_csv(fileBatmis, dtype=str, on_bad_lines="skip", delimiter=';', engine='python')
         # dataBatmisRaw = dataBatmisRaw.apply(hapus_kutip)
         dataBatmisRaw.columns = [col.strip('"') for col in dataBatmisRaw.columns]
 
