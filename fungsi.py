@@ -48,7 +48,8 @@ def convert_date(date_string, formats=date_formats, target_format="%Y-%m-%d"):
         except ValueError:
             continue  # Jika gagal, coba format berikutnya
     
-    raise ValueError(f"Date format for '{date_string}' not recognized.")
+    # Jika bukan tanggal valid, ubah menjadi NaN
+    return np.nan  
 
 # Fungsi untuk merge data
 def process_merge_data(fileShipment, fileBatmis, fileProcurement):
