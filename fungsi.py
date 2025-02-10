@@ -263,10 +263,10 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataMergeAllFiltered.drop_duplicates(subset=['ORDER_TYPE-NUMBER-LINE'], inplace=True, keep='last')
 
-        dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce')
+        oldNewDate = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce')
 
-        oldestDate = dataMergeAllFiltered['CREATED DATE_x'].min()
-        newestDate = dataMergeAllFiltered['CREATED DATE_x'].max()
+        oldestDate = oldNewDate['CREATED DATE_x'].min()
+        newestDate = oldNewDate['CREATED DATE_x'].max()
 
         return dataMergeAllFiltered, oldestDate, newestDate
 
