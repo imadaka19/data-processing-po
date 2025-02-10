@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 import numpy as np
-# import re
+import re
 # def detect_delimiter(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
 #     """Deteksi delimiter dengan membaca beberapa baris pertama dari file CSV."""
 #     for enc in encodings:
@@ -22,40 +22,37 @@ import numpy as np
 #     return ','  # Default delimiter
 
 # Format tanggal yang didukung
-date_formats = [
-    "%d-%m-%Y",  # 10-02-2024
-    # "%Y-%m-%d",  # 2024-02-10
-    # "%Y/%m/%d",  # 2024/02/10
-    # "%m/%d/%Y",  # 02/10/2024
-    "%d/%m/%Y",  # 10/02/2024
-    # "%B %d, %Y", # February 10, 2024
-    "%d-%b-%y",  # 10-Feb-24
-    "%d-%m-%y",  # 10-02-24
-    "%d/%b/%y",  # 10-Feb-24
-    "%d/%m/%y",  # 10-02-24
-]
+# date_formats = [
+#     "%d-%m-%Y",  # 10-02-2024
+#     # "%Y-%m-%d",  # 2024-02-10
+#     # "%Y/%m/%d",  # 2024/02/10
+#     # "%m/%d/%Y",  # 02/10/2024
+#     "%d/%m/%Y",  # 10/02/2024
+#     # "%B %d, %Y", # February 10, 2024
+#     "%d-%b-%y",  # 10-Feb-24
+#     "%d-%m-%y",  # 10-02-24
+#     "%d/%b/%y",  # 10-Feb-24
+#     "%d/%m/%y",  # 10-02-24
+# ]
 
-def convert_date(date_string, formats=date_formats, target_format="%Y-%m-%d"):
-    # Cek jika nilai None, NaN, atau bukan string yang bisa diproses
-    if pd.isna(date_string) or str(date_string).lower() == 'nan' or date_string is None:
-        return np.nan  # Kembalikan NaN agar tetap konsisten dalam DataFrame
+# def convert_date(date_string, formats=date_formats, target_format="%Y-%m-%d"):
+#     # Cek jika nilai None, NaN, atau bukan string yang bisa diproses
+#     if pd.isna(date_string) or str(date_string).lower() == 'nan' or date_string is None:
+#         return np.nan  # Kembalikan NaN agar tetap konsisten dalam DataFrame
     
-    # Loop melalui berbagai format yang didukung
-    for fmt in formats:
-        try:
-            # Coba parsing tanggal dengan format yang tersedia
-            date_obj = datetime.strptime(str(date_string), fmt)
-            # Kembalikan tanggal dalam format target
-            return date_obj.strftime(target_format)
-        except ValueError:
-            continue  # Jika gagal, coba format berikutnya
+#     # Loop melalui berbagai format yang didukung
+#     for fmt in formats:
+#         try:
+#             # Coba parsing tanggal dengan format yang tersedia
+#             date_obj = datetime.strptime(str(date_string), fmt)
+#             # Kembalikan tanggal dalam format target
+#             return date_obj.strftime(target_format)
+#         except ValueError:
+#             continue  # Jika gagal, coba format berikutnya
     
-    # Jika bukan tanggal valid, ubah menjadi NaN
-    return date_string
+#     # Jika bukan tanggal valid, ubah menjadi NaN
+#     return date_string
 
-# def hapus_kutip(text) :
-#     result = re.sub(r'^"(.*)"$', r'\1', text)
-#     return result
 
 # Fungsi untuk merge data
 def process_merge_data(fileShipment, fileBatmis, fileProcurement):
@@ -68,13 +65,8 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataShipmentRaw = pd.concat([dataShipmentRaw_1, dataShipmentRaw_2])
 
-        dataBatmisRaw = pd.read_csv(fileBatmis, dtype=str, on_bad_lines="skip", delimiter=';', engine='python')
-        # dataBatmisRaw = dataBatmisRaw.apply(hapus_kutip)
-        dataBatmisRaw.columns = [col.strip('"') for col in dataBatmisRaw.columns]
+        dataBatmisRaw = pd.read_csv(fileBatmis, on_bad_lines='skip', quoting=3, delimiter=",")
 
-        # Menghapus tanda kutip di seluruh data
-        dataBatmisRaw = dataBatmisRaw.applymap(lambda x: x.strip('"') if isinstance(x, str) else x)
-        
         # Preparasi Data Procurement
         dataProcurementRaw_1 = pd.read_excel(fileProcurement, sheet_name='AFM')
         dataProcurementRaw_2 = pd.read_excel(fileProcurement, sheet_name='CMA')
@@ -92,11 +84,20 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataProcurementRaw['LINE'] = pd.to_numeric(dataProcurementRaw['LINE'], errors='coerce').astype('Int64')
 
+        # Remove quotes from the header if they appear at both ends
+        dataBatmisRaw.columns = dataBatmisRaw.columns.map(lambda x: re.sub('^"(.*)"$', r'\1', x))
+
+        # Remove quotes from the data if they appear at both ends
+        # Also remove excessive internal quotes (like "" -> ")
+        dataBatmisRaw = dataBatmisRaw.applymap(lambda x: re.sub(r'^"(.*)"$', r'\1', re.sub(r'""+', '"', x)) if isinstance(x, str) else x)
+
         # Pengolahan data BATMIS
+        #dataBatmisProcessed = dataBatmisRaw[['REQUISITION', 'ORDER TYPE', 'ORDER NUMBER', 'ORDER LINE', 'STATUS', 'CREATED DATE', 'DATE AWB OUT', 'AUTHORIZATION_DATE', 'AUTHRQ_DATE', 'AUTHRQ_ID', 'AUTHRQ_BY', 'ORDER PN', 'PN DESCRIPTION', 'GRB_HISTORY', 'QTY', 'QTY_RCVD', 'UOM', 'AWB IN NUMBER', 'RRP_DATE', 'RRP_BY', 'NAME_RRPBY']]
         dataBatmisProcessed = dataBatmisRaw[['REQUISITION', 'ORDER TYPE', 'ORDER NUMBER', 'ORDER LINE', 'STATUS', 'CREATED DATE', 'DATE AWB OUT', 'AUTHORIZATION_DATE', 'AUTHRQ_DATE', 'AUTHRQ_ID', 'AUTHRQ_BY', 'ORDER PN', 'PN DESCRIPTION', 'GRB_HISTORY', 'QTY', 'QTY_RCVD', 'UOM', 'AWB IN NUMBER', 'RRP_DATE', 'RRP_BY', 'NAME_RRPBY']]
+
         dataBatmisProcessed['ORDER_TYPE-NUMBER-LINE'] = dataBatmisProcessed['ORDER TYPE'] + '-' + dataBatmisProcessed['ORDER NUMBER'].astype(str) + '-' + dataBatmisProcessed['ORDER LINE'].astype(str)
         dataBatmisProcessed['ORDER_TYPE-NUMBER-PN'] = dataBatmisProcessed['ORDER TYPE'] + '-' + dataBatmisProcessed['ORDER NUMBER'].astype(str)+ '-' + dataBatmisProcessed['ORDER PN'].astype(str)
-
+        
         dataBatmisProcessed = dataBatmisProcessed.set_index('ORDER_TYPE-NUMBER-LINE')
         dataBatmisProcessed['ORDER_TYPE-NUMBER-LINE'] = dataBatmisProcessed['ORDER TYPE'] + '-' + dataBatmisProcessed['ORDER NUMBER'].astype(str) + '-' + dataBatmisProcessed['ORDER LINE'].astype(str)
 
@@ -125,6 +126,9 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataShipmentRaw_4.set_index(['ORDER_TYPE-NUMBER-PN'], inplace=True)
         dataShipmentRaw_4['ORDER_TYPE-NUMBER-PN'] = dataShipmentRaw_4['ORDER TYPE'] + '-' + dataShipmentRaw_4['ORDER NUMBER'].astype(str)+ '-' + dataShipmentRaw_4['PN'].astype(str)
 
+        #dataShipmentRaw_4['DELIVERY DATE'] = pd.to_datetime(dataShipmentRaw_4['DELIVERY DATE'], format="%d/%m/%Y", errors="ignore").astype('str')
+
+        
         def swap_day_month(date):
             if isinstance(date, datetime):
                 # Swap day and month
@@ -139,6 +143,11 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataShipmentRaw_4['DELIVERY DATE'] = pd.to_datetime(dataShipmentRaw_4['DELIVERY DATE'], errors="coerce", dayfirst=False)
         dataShipmentRaw_4['DELIVERY DATE'] = dataShipmentRaw_4['DELIVERY DATE'].dt.strftime('%Y-%m-%d')
         dataShipmentRaw_4['DELIVERY DATE']= pd.to_datetime(dataShipmentRaw_4['DELIVERY DATE'], errors='ignore')
+
+        #dataShipmentRaw_4['DELIVERY DATE'] = pd.to_datetime(dataShipmentRaw_4['DELIVERY DATE'], errors='coerce', format='%d/%m/%Y')
+        #dataShipmentRaw_4['DELIVERY DATE'] = pd.to_datetime(dataShipmentRaw_4['DELIVERY DATE'], errors='coerce')
+         # Convert to datetime, handle errors
+        #dataShipmentRaw_4['DELIVERY DATE'] = dataShipmentRaw_4['DELIVERY DATE'].dt.strftime('%Y-%m-%d')
 
         # Mengolah data ShipmentRaw
         dataShipmentRaw = dataShipmentRaw[['ORDER TYPE', 'ORDER NUMBER', 'PN', 'AWB/BL NUMBER', 'DELIVERY DATE', 'STATUS NEW']]
@@ -167,7 +176,6 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataMergeAll['DATE AWB OUT_x'] = dataMergeAll['DATE AWB OUT_y'].fillna(dataMergeAll['DATE AWB OUT_x'])
         dataMergeAll['AWB IN NUMBER'] = dataMergeAll['AWB/BL NUMBER'].fillna(dataMergeAll['AWB IN NUMBER'])
-        
         # Pengolahan data MergeAllFiltered dan export data Merged
 
         dataMergeAllFiltered = dataMergeAll[[
@@ -177,47 +185,42 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataMergeAllFiltered.reset_index(drop=True,inplace=True)
 
-        # # Menyeragamkan tanggal menjadi Y-m-d
-        # def convert_date_format(date_str):
-        #     if pd.isna(date_str):
-        #         return date_str
-        #     try:
-        #         date_obj = pd.to_datetime(date_str, format='%d-%b-%y')
-        #         return date_obj.strftime('%d-%m-%y')
-        #     except ValueError:
-        #         return date_str
+        # Menyeragamkan tanggal menjadi Y-m-d
+        def convert_date_format(date_str):
+            if pd.isna(date_str):
+                return date_str
+            try:
+                date_obj = pd.to_datetime(date_str, format='%d-%b-%y')
+                return date_obj.strftime('%d-%m-%y')
+            except ValueError:
+                return date_str
 
-        # def convert_date_format2(date_str):
-        #     if pd.isna(date_str):
-        #         return date_str
-        #     try:
-        #         date_obj = pd.to_datetime(date_str, format='%d-%m-%y')
-        #         return date_obj.strftime('%Y-%m-%d')
-        #     except ValueError:
-        #         return date_str
-        # dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(
-        #     lambda x: pd.to_datetime(x, errors='coerce').date() if pd.notna(x) else np.nan
-        # )
-        # dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))        
-        # dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))
+        def convert_date_format2(date_str):
+            if pd.isna(date_str):
+                return date_str
+            try:
+                date_obj = pd.to_datetime(date_str, format='%d-%m-%y')
+                return date_obj.strftime('%Y-%m-%d')
+            except ValueError:
+                return date_str
 
-        # dataMergeAllFiltered['AUTHORIZATION_DATE'] = pd.to_datetime(dataMergeAllFiltered['AUTHORIZATION_DATE'], errors='coerce').dt.date
-        dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(lambda x: convert_date(str(x)))
-        # dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(lambda x: convert_date(str(x)))
+        dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(convert_date_format)
+        dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(convert_date_format2)
 
-        # dataMergeAllFiltered['AUTHRQ_DATE'] = pd.to_datetime(dataMergeAllFiltered['AUTHRQ_DATE'], errors='coerce').dt.date
-        dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(lambda x: convert_date(str(x)))
-        # dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(lambda x: convert_date(str(x)))
+        dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(convert_date_format)
+        dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(convert_date_format2)
 
-        # dataMergeAllFiltered['RRP_DATE'] = pd.to_datetime(dataMergeAllFiltered['RRP_DATE'], errors='coerce').dt.date
-        dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(lambda x: convert_date(str(x)))
-        # dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(lambda x: convert_date(str(x)))
+        dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(convert_date_format)
+        dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(convert_date_format2)
 
-        # dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce').dt.date
-        # dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce', format='%d/%m/%Y')
-        dataMergeAllFiltered['CREATED DATE_x'] = dataMergeAllFiltered['CREATED DATE_x'].apply(lambda x: convert_date(str(x)))
+        dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(convert_date_format)
+        dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(convert_date_format2)
 
         
+        #dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce', format='%d/%m/%Y')
+        dataMergeAllFiltered['CREATED DATE_x'] = dataMergeAllFiltered['CREATED DATE_x'].apply(convert_date_format2)
+        # prompt: Create a function to check the feature 'RRP DATE' in file 'dataMerge.xlsx' in sheet 'Sheet 1' according to the quartile of the day. I would like 3 quartiles of the day, day 1-10 (named Q1), 11-20 (named Q2), and 21-30 (named Q3). Then apply the function to the dataframe in a new column 'Quartile' with the formula YYYY-MM-Quartile, so for example 5 March 2025 the data in the column 'Quartile' would be 2025-03-Q1
+
         # Assigning quartile to created Date
         def assign_quartile_created(date_str):
             try:
@@ -252,15 +255,16 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
                     return "Invalid Date"
             except (ValueError, TypeError):
                 return "Invalid Date"
+
         dataMergeAllFiltered['Quartile_RRP'] = dataMergeAllFiltered['RRP_DATE'].apply(assign_quartile_rrp)
         dataMergeAllFiltered['Quartile_Shipped'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(assign_quartile_rrp)
         dataMergeAllFiltered['Quartile_Created'] = dataMergeAllFiltered['CREATED DATE_x'].apply(assign_quartile_created)
         dataMergeAllFiltered['Date_Shipped'] = dataMergeAllFiltered['DATE AWB OUT_x'].fillna('Invalid Date')
 
         dataMergeAllFiltered.drop_duplicates(subset=['ORDER_TYPE-NUMBER-LINE'], inplace=True, keep='last')
-        # dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce').dt.date
-        # dataMergeAllFiltered['CREATED DATE_x'] = dataMergeAllFiltered['CREATED DATE_x'].date()
-        
+
+        dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce')
+
         oldestDate = dataMergeAllFiltered['CREATED DATE_x'].min()
         newestDate = dataMergeAllFiltered['CREATED DATE_x'].max()
 
