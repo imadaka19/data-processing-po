@@ -18,6 +18,26 @@ import pandas as pd
 #             break
 #     return ','  # Default delimiter
 
+date_formats = [ 
+    "%d-%m-%Y",   # DD-MM-YYYY 
+    "%Y/%m/%d",   # YYYY/MM/DD 
+    "%m/%d/%Y",   # MM/DD/YYYY 
+    "%B %d, %Y", # Month Day, Year
+    "%d-%b-%y",   
+    "%d-%m-%y",
+]
+
+def convert_date(date_string, formats, target_format="%Y-%m-%d"): 
+    for fmt in formats: 
+        try: 
+            # Try to parse the date string with the current format 
+            date_obj = datetime.strptime(date_string, fmt) 
+            # Return the date in the target format 
+            return date_obj.strftime(target_format) 
+        except ValueError: 
+            continue  # If it fails, try the next format 
+    raise ValueError(f"Date format for '{date_string}' not recognized.") 
+
 # Fungsi untuk merge data
 def process_merge_data(fileShipment, fileBatmis, fileProcurement):
     # delimiter = detect_delimiter(fileBatmis, encodings=['utf-8', 'ISO-8859-1', 'latin1'])
@@ -120,39 +140,39 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataMergeAllFiltered.reset_index(drop=True,inplace=True)
 
-        # Menyeragamkan tanggal menjadi Y-m-d
-        def convert_date_format(date_str):
-            if pd.isna(date_str):
-                return date_str
-            try:
-                date_obj = pd.to_datetime(date_str, format='%d-%b-%y')
-                return date_obj.strftime('%d-%m-%y')
-            except ValueError:
-                return date_str
+        # # Menyeragamkan tanggal menjadi Y-m-d
+        # def convert_date_format(date_str):
+        #     if pd.isna(date_str):
+        #         return date_str
+        #     try:
+        #         date_obj = pd.to_datetime(date_str, format='%d-%b-%y')
+        #         return date_obj.strftime('%d-%m-%y')
+        #     except ValueError:
+        #         return date_str
 
-        def convert_date_format2(date_str):
-            if pd.isna(date_str):
-                return date_str
-            try:
-                date_obj = pd.to_datetime(date_str, format='%d-%m-%y')
-                return date_obj.strftime('%Y-%m-%d')
-            except ValueError:
-                return date_str
+        # def convert_date_format2(date_str):
+        #     if pd.isna(date_str):
+        #         return date_str
+        #     try:
+        #         date_obj = pd.to_datetime(date_str, format='%d-%m-%y')
+        #         return date_obj.strftime('%Y-%m-%d')
+        #     except ValueError:
+        #         return date_str
 
-        dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(convert_date_format)
-        dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(convert_date_format2)
+        dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(convert_date)
+        dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(convert_date)
 
-        dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(convert_date_format)
-        dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(convert_date_format2)
+        dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(convert_date)
+        dataMergeAllFiltered['AUTHORIZATION_DATE'] = dataMergeAllFiltered['AUTHORIZATION_DATE'].apply(convert_date)
 
-        dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(convert_date_format)
-        dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(convert_date_format2)
+        dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(convert_date)
+        dataMergeAllFiltered['AUTHRQ_DATE'] = dataMergeAllFiltered['AUTHRQ_DATE'].apply(convert_date)
 
-        dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(convert_date_format)
-        dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(convert_date_format2)
+        dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(convert_date)
+        dataMergeAllFiltered['RRP_DATE'] = dataMergeAllFiltered['RRP_DATE'].apply(convert_date)
 
         dataMergeAllFiltered['CREATED DATE_x'] = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce', format='%d/%m/%Y')
-        dataMergeAllFiltered['CREATED DATE_x'] = dataMergeAllFiltered['CREATED DATE_x'].apply(convert_date_format2)
+        dataMergeAllFiltered['CREATED DATE_x'] = dataMergeAllFiltered['CREATED DATE_x'].apply(convert_date)
 
         
         # Assigning quartile to created Date
