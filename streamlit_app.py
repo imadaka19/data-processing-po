@@ -8,7 +8,7 @@ import fungsi
 st.sidebar.header("About")
 st.sidebar.text("""
     Langkah-langkah:\n
-        1. Upload File Shipment, BATMIS, dan Procurement di tempat yang sudah disediakan.\n
+        1. Upload File Shipment, BATMIS dengan delimiter file titik koma (;), dan Procurement di tempat yang sudah disediakan.\n
         2. Klik tombol "Submit & Process Merge Data" untuk melakukan proses penggabungan data.\n
         3. Tunggu hingga proses selesai dilakukan hingga muncul tombol "Download Hasil Merge".\n
         4. Klik tombol "Download Hasil Merge" untuk mendownload hasil penggabungan data.\n
@@ -29,7 +29,7 @@ if st.button("🔄 Reset"):
     reset_session()
 
 fileShipment = st.file_uploader("Upload Shipment File (Excel)", type=['xlsx'])
-fileBatmis = st.file_uploader("Upload Batmis File (CSV)", type=['csv'])
+fileBatmis = st.file_uploader("Upload Batmis File (CSV delimiter titik koma ';')", type=['csv'])
 fileProcurement = st.file_uploader("Upload Procurement File (Excel)", type=['xlsx'])
 
 if fileShipment and fileBatmis and fileProcurement:
