@@ -65,7 +65,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataShipmentRaw = pd.concat([dataShipmentRaw_1, dataShipmentRaw_2])
 
-        dataBatmisRaw = pd.read_csv(fileBatmis, on_bad_lines='skip', quoting=3, delimiter=",")
+        dataBatmisRaw = pd.read_csv(fileBatmis, on_bad_lines='skip', quoting=3, delimiter=";")
 
         # Preparasi Data Procurement
         dataProcurementRaw_1 = pd.read_excel(fileProcurement, sheet_name='AFM')
