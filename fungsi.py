@@ -195,10 +195,10 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         #         return date_obj.strftime('%Y-%m-%d')
         #     except ValueError:
         #         return date_str
-        dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(
-            lambda x: pd.to_datetime(x, errors='coerce').date() if pd.notna(x) else np.nan
-        )
-        dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))        
+        # dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(
+        #     lambda x: pd.to_datetime(x, errors='coerce').date() if pd.notna(x) else np.nan
+        # )
+        # dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))        
         # dataMergeAllFiltered['DATE AWB OUT_x'] = dataMergeAllFiltered['DATE AWB OUT_x'].apply(lambda x: convert_date(str(x)))
 
         # dataMergeAllFiltered['AUTHORIZATION_DATE'] = pd.to_datetime(dataMergeAllFiltered['AUTHORIZATION_DATE'], errors='coerce').dt.date
