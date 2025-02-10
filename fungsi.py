@@ -24,13 +24,15 @@ import numpy as np
 # Format tanggal yang didukung
 date_formats = [
     "%d-%m-%Y",  # 10-02-2024
-    "%Y-%m-%d",  # 2024-02-10
-    "%Y/%m/%d",  # 2024/02/10
-    "%m/%d/%Y",  # 02/10/2024
+    # "%Y-%m-%d",  # 2024-02-10
+    # "%Y/%m/%d",  # 2024/02/10
+    # "%m/%d/%Y",  # 02/10/2024
     "%d/%m/%Y",  # 10/02/2024
-    "%B %d, %Y", # February 10, 2024
+    # "%B %d, %Y", # February 10, 2024
     "%d-%b-%y",  # 10-Feb-24
     "%d-%m-%y",  # 10-02-24
+    "%d/%b/%y",  # 10-Feb-24
+    "%d/%m/%y",  # 10-02-24
 ]
 
 def convert_date(date_string, formats=date_formats, target_format="%Y-%m-%d"):
