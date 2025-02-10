@@ -21,35 +21,39 @@ import numpy as np
 #             break
 #     return ','  # Default delimiter
 
-date_formats = [ 
-    "%d-%m-%Y",   # DD-MM-YYYY 
-    "%Y/%m/%d",   # YYYY/MM/DD 
-    "%m/%d/%Y",   # MM/DD/YYYY 
-    "%B %d, %Y", # Month Day, Year
-    "%d-%b-%y",   
-    "%d-%m-%y",
+# Format tanggal yang didukung
+date_formats = [
+    "%d-%m-%Y",  # 10-02-2024
+    "%Y-%m-%d",  # 2024-02-10
+    "%Y/%m/%d",  # 2024/02/10
+    "%m/%d/%Y",  # 02/10/2024
+    "%d/%m/%Y",  # 10/02/2024
+    "%B %d, %Y", # February 10, 2024
+    "%d-%b-%y",  # 10-Feb-24
+    "%d-%m-%y",  # 10-02-24
 ]
 
-# def hapus_kutip(text) :
-#     result = re.sub(r'^"(.*)"$', r'\1', text)
-#     return result
-
 def convert_date(date_string, formats=date_formats, target_format="%Y-%m-%d"):
-    # Cek jika nilai None, NaN, atau bukan string
-    if date_string is None or pd.isna(date_string) or not isinstance(date_string, str) or date_string.lower() == 'nan':
+    # Cek jika nilai None, NaN, atau bukan string yang bisa diproses
+    if pd.isna(date_string) or str(date_string).lower() == 'nan' or date_string is None:
         return np.nan  # Kembalikan NaN agar tetap konsisten dalam DataFrame
     
+    # Loop melalui berbagai format yang didukung
     for fmt in formats:
         try:
             # Coba parsing tanggal dengan format yang tersedia
-            date_obj = datetime.strptime(date_string, fmt)
+            date_obj = datetime.strptime(str(date_string), fmt)
             # Kembalikan tanggal dalam format target
             return date_obj.strftime(target_format)
         except ValueError:
             continue  # Jika gagal, coba format berikutnya
     
     # Jika bukan tanggal valid, ubah menjadi NaN
-    return date_string
+    return np.nan 
+
+# def hapus_kutip(text) :
+#     result = re.sub(r'^"(.*)"$', r'\1', text)
+#     return result
 
 # Fungsi untuk merge data
 def process_merge_data(fileShipment, fileBatmis, fileProcurement):
