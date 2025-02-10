@@ -115,6 +115,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataProcurement['CREATED DATE'] = pd.to_datetime(dataProcurement['CREATED DATE'], errors='coerce', format='%Y-%m-%d')
 
         dataProcurement['ETA'] = pd.to_datetime(dataProcurement['ETA'], errors='coerce', format='%Y-%m-%d %H:%M:%S')
+        dataProcurement['ETA'] = dataProcurement['ETA'].dt.strftime('%Y-%m-%d')
 
         dataProcurement.rename({'TYPE':'ORDER TYPE', 'ORDER':'ORDER NUMBER', 'LINE':'ORDER LINE', 'ORDER CREATED DATE':'CREATED DATE', 'PN':'ORDER PN'}, axis=1, inplace=True)
 
@@ -265,8 +266,13 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         oldNewDate = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce')
 
-        oldestDate = oldNewDate['CREATED DATE_x'].min()
-        newestDate = oldNewDate['CREATED DATE_x'].max()
+        oldestDate = oldNewDate.min()
+        newestDate = oldNewDate.max()
+
+        dataMergeAllFiltered['ORDER NUMBER_x'] = pd.to_numeric(dataMergeAllFiltered['ORDER NUMBER_x'], errors='coerce')
+        dataMergeAllFiltered.dropna(subset=['ORDER NUMBER_x'], inplace=True)
+        dataMergeAllFiltered.reset_index(inplace=True)
+        dataMergeAllFiltered.drop(columns=['index'], inplace=True)
 
         return dataMergeAllFiltered, oldestDate, newestDate
 
