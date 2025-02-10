@@ -49,7 +49,7 @@ def convert_date(date_string, formats=date_formats, target_format="%Y-%m-%d"):
             continue  # Jika gagal, coba format berikutnya
     
     # Jika bukan tanggal valid, ubah menjadi NaN
-    return np.nan 
+    return date_string
 
 # def hapus_kutip(text) :
 #     result = re.sub(r'^"(.*)"$', r'\1', text)
