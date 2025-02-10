@@ -33,16 +33,21 @@ date_formats = [
 #     result = re.sub(r'^"(.*)"$', r'\1', text)
 #     return result
 
-def convert_date(date_string, formats = date_formats, target_format="%Y-%m-%d"): 
-    for fmt in formats: 
-        try: 
-            # Coba parsing tanggal dengan format yang sekarang
-            date_obj = datetime.strptime(date_string, fmt) 
+def convert_date(date_string, formats=date_formats, target_format="%Y-%m-%d"):
+    # Cek jika nilai NaN atau bukan string
+    if pd.isna(date_string) or not isinstance(date_string, str) or date_string.lower() == 'nan':
+        return np.nan  # Kembalikan NaN agar tetap konsisten dalam DataFrame
+    
+    for fmt in formats:
+        try:
+            # Coba parsing tanggal dengan format yang tersedia
+            date_obj = datetime.strptime(date_string, fmt)
             # Kembalikan tanggal dalam format target
-            return date_obj.strftime(target_format) 
-        except ValueError: 
-            continue  # Jika gagal, coba format berikutnya 
-    raise ValueError(f"Date format for '{date_string}' not recognized.") 
+            return date_obj.strftime(target_format)
+        except ValueError:
+            continue  # Jika gagal, coba format berikutnya
+    
+    raise ValueError(f"Date format for '{date_string}' not recognized.")
 
 # Fungsi untuk merge data
 def process_merge_data(fileShipment, fileBatmis, fileProcurement):
