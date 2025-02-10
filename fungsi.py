@@ -29,9 +29,9 @@ date_formats = [
     "%d-%m-%y",
 ]
 
-def hapus_kutip(text) :
-    result = re.sub(r'^"(.*)"$', r'\1', text)
-    return result
+# def hapus_kutip(text) :
+#     result = re.sub(r'^"(.*)"$', r'\1', text)
+#     return result
 
 def convert_date(date_string, formats = date_formats, target_format="%Y-%m-%d"): 
     for fmt in formats: 
@@ -56,7 +56,7 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         dataShipmentRaw = pd.concat([dataShipmentRaw_1, dataShipmentRaw_2])
 
         dataBatmisRaw = pd.read_csv(fileBatmis, dtype=str, on_bad_lines="skip", sep="[;,]", engine='python')
-        dataBatmisRaw = dataBatmisRaw.apply(hapus_kutip)
+        # dataBatmisRaw = dataBatmisRaw.apply(hapus_kutip)
         
         # Preparasi Data Procurement
         dataProcurementRaw_1 = pd.read_excel(fileProcurement, sheet_name='AFM')
