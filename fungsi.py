@@ -1,6 +1,6 @@
 import pandas as pd
-import datetime
-import re
+from datetime import datetime
+# import re
 # def detect_delimiter(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
 #     """Deteksi delimiter dengan membaca beberapa baris pertama dari file CSV."""
 #     for enc in encodings:
