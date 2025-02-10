@@ -57,6 +57,10 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
 
         dataBatmisRaw = pd.read_csv(fileBatmis, dtype=str, on_bad_lines="skip", sep="[;,]", engine='python')
         # dataBatmisRaw = dataBatmisRaw.apply(hapus_kutip)
+        dataBatmisRaw.columns = [col.strip('"') for col in dataBatmisRaw.columns]
+
+        # Menghapus tanda kutip di seluruh data
+        dataBatmisRaw = dataBatmisRaw.applymap(lambda x: x.strip('"') if isinstance(x, str) else x)
         
         # Preparasi Data Procurement
         dataProcurementRaw_1 = pd.read_excel(fileProcurement, sheet_name='AFM')
