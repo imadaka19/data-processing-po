@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import datetime
 import numpy as np
 import re
+
 # def detect_delimiter(file, encodings=['utf-8', 'ISO-8859-1', 'latin1']):
 #     """Deteksi delimiter dengan membaca beberapa baris pertama dari file CSV."""
 #     for enc in encodings:
@@ -267,8 +268,9 @@ def process_merge_data(fileShipment, fileBatmis, fileProcurement):
         oldNewDate = pd.to_datetime(dataMergeAllFiltered['CREATED DATE_x'], errors='coerce')
         oldestDate = oldNewDate.min()
         oldestDate = oldestDate.strftime('%Y-%m-%d')
+
         newestDate = oldNewDate.max()
-        newestDate = newestDate.strftime('%Y-%m-%d') # DENSUU
+        newestDate = newestDate.strftime('%Y-%m-%d')
 
         dataMergeAllFiltered['ORDER NUMBER_x'] = pd.to_numeric(dataMergeAllFiltered['ORDER NUMBER_x'], errors='coerce')
         dataMergeAllFiltered.dropna(subset=['ORDER NUMBER_x'], inplace=True)
